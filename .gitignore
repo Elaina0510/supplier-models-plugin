@@ -1,2 +1,19 @@
+# Python 产物
 __pycache__/
 *.pyc
+
+# 隐私：配置与密钥永不进仓（含测试 harness 用过的副本）
+config.yaml
+config.yml
+.env
+.env.*
+*.pem
+*.key
+*_bak
+*.bak
+*.bak-*
+
+# 测试临时副本目录
+harness/
+providerchange-harness/
+supplier-models-harness/
