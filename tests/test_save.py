@@ -1,20 +1,21 @@
 """M4 验收：写链路的**保存**路径 ``POST /endpoints``（M4.1 / M4.10；铁律 1 与铁律 2 的落盘面）。
 
-跑法（``tasks/progress.md`` §五 / ``prompt.md`` §5.1，逐字照抄；venv 里没有 pytest 也不许装）：
+跑法（``tasks/progress.md`` §五 / ``prompt.md`` §5.1，填好占位后照抄；venv 里没有 pytest 也不许装）：
 
-    cd "H:/application/hermesnew/home/plugins/supplier-models"
-    V="H:/application/hermesnew/hermes-agent/venv/Scripts/python.exe"
-    T="$LOCALAPPDATA/Temp/providerchange-harness"
+    cd "<本仓根目录>"                        # 必须 cd 到含 tests/ 的目录，discover 依赖 cwd
+    V="<装有 hermes_cli 的 venv 里的 python>"
+    T="<临时目录>/supplier-models-harness"    # 副本务必建在仓外，本仓 .gitignore 已排除 config/.env
     rm -rf "$T" && mkdir -p "$T"
-    cp H:/application/hermesnew/home/config.yaml "$T/config.yaml"
-    cp H:/application/hermesnew/home/.env         "$T/.env"
+    cp "<副本源 config.yaml>" "$T/config.yaml"   # 副本源须仍留有 legacy custom_providers: 条目
+    cp "<副本源 .env>"        "$T/.env"
     HERMES_HOME="$(cygpath -w "$T")" "$V" -m unittest discover -s tests -v
     rm -rf "$T"      # 副本里含明文密钥，跑完必须删
 
 ⚠️ **v0.0.3 系列的跑法改用主 Agent 钉住的 harness 变体**（``tasksv0.0.3/progress.md`` §八，
 2026-09-25 用户裁决）：真配置已结构性漂移（两条 legacy 条目被并进 ``providers:``），
-副本源改成 **09-24 基线备份对**（``providerchange-backups/config.yaml.bak-20260924-140439``
-与 ``env.bak-20260924-140439``，**只读源**），其余命令逐字不变。
+副本源改成**漂移之前的基线备份对**（还留有 legacy ``custom_providers:`` 条目的那一份
+``config.yaml`` + 对应 ``.env``，**只读源**），其余命令不变。手上没有这种备份时得手工
+构造同样形状的副本 —— 喂 ``custom_providers: []`` 会成批 ``setUp`` 前置断言失败。
 「只写副本 / 跑完 ``rm -rf`` / 真 ``config.yaml`` 与 ``.env`` 全程只读」三条纪律照旧。
 
 本文件是本项目的**第一处写路径测试**，四条纪律：

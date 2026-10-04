@@ -3,21 +3,22 @@
 设计依据：``detailed-designv0.0.3.md`` §4（§4.3.1/4.3.2/4.3.3 三条路由、§4.3.4 拒绝面表、
 §4.5 状态机、§4.7 测试表 a–k）；需求 ``proposalv0.0.3.md`` §5.2.2 / §5.4。
 
-⚠️ 跑法（``tasksv0.0.3/progress.md`` §八 主 Agent 钉住的 harness 变体，逐字照抄；
+⚠️ 跑法（``tasksv0.0.3/progress.md`` §八 主 Agent 钉住的 harness 变体，填好占位后照抄；
 **venv 里没有 pytest，也不许装** —— stdlib ``unittest`` only）：
 
-    cd "H:/application/hermesnew/home/plugins/supplier-models"
-    V="H:/application/hermesnew/hermes-agent/venv/Scripts/python.exe"
-    T="$LOCALAPPDATA/Temp/providerchange-harness"
-    B="$LOCALAPPDATA/Temp/providerchange-backups"
+    cd "<本仓根目录>"                        # 必须 cd 到含 tests/ 的目录，discover 依赖 cwd
+    V="<装有 hermes_cli 的 venv 里的 python>"
+    T="<临时目录>/supplier-models-harness"    # 副本务必建在仓外，本仓 .gitignore 已排除 config/.env
     rm -rf "$T" && mkdir -p "$T"
-    cp "$B/config.yaml.bak-20260924-140439" "$T/config.yaml"
-    cp "$B/env.bak-20260924-140439"         "$T/.env"
+    cp "<基线备份 config.yaml>" "$T/config.yaml"
+    cp "<基线备份 .env>"        "$T/.env"
     HERMES_HOME="$(cygpath -w "$T")" "$V" -m unittest discover -s tests -v
     rm -rf "$T"      # 副本里含明文密钥，跑完必须删
 
-（副本源是 **09-24 基线备份对**、不是当前真配置：progress §八 的 R-1 裁决。真
-``config.yaml`` / ``.env`` 全程只读。）
+（副本源是**仍留有 legacy ``custom_providers:`` 条目的基线备份对**、不是当前真配置：
+progress §八 的 R-1 裁决；真 ``config.yaml`` / ``.env`` 全程只读。手上没有这种备份时得
+手工构造同样形状的副本 —— 喂一份 ``custom_providers: []`` 的副本会成批 ``setUp`` 前置
+断言失败，那是输入不匹配、不是代码缺陷。）
 
 四条纪律（照 ``test_migrate.py`` 的头注口径，本文件同样写盘）：
 

@@ -4,8 +4,10 @@
 `custom_providers:`（cc-switch 按旧 schema 写回的 legacy 条目）收进同一个列表、提供「钉住白名单 /
 清空白名单 / 设为当前 / 迁移进 `providers:` / 接管内置供应商」等动作。
 
-**本仓现状**：终版代码的补档，**未在现行环境安装运行**（当前 `%LOCALAPPDATA%\hermes\plugins\` 为空）。
-代码从 2026-10-02 的 home 归档原样入库，13 件源码/测试逐文件 md5 与归档一致。
+**本仓现状**：终版代码的补档，**未在现行 Hermes 环境里安装运行**（当前 home 的 `plugins/` 下没有本插件）。
+代码从 2026-10-02 的 home 归档原样入库；入库后只动过两处文档 —— 8 个测试文件 docstring 里的「跑法」
+说明由本机绝对路径改成中性占位，以及新增本文档。**其余源码逐字节与归档一致**：`desktop/plugin.js`、
+`dashboard/plugin_api.py`、`dashboard/manifest.json`、`plugin.yaml` 的 md5 已逐项核对相同。
 
 ---
 
@@ -70,12 +72,12 @@ legacy 行的 id 统一带 `cc:` 前缀，避免与 `providers:` 条目撞 id。
 运行器是 stdlib `unittest`（venv 里没有 pytest，也不装）。破坏性用例只碰 `HERMES_HOME` 的**临时副本**：
 
 ```bash
-cd "D:/hermeswork/supplier-models-plugin"          # 必须 cd 到含 tests/ 的目录，discover 依赖 cwd
-V="H:/application/hermesnew/hermes-agent/venv/Scripts/python.exe"
-T="$LOCALAPPDATA/Temp/supplier-models-harness"
+cd "<本仓根目录>"                        # 必须 cd 到含 tests/ 的目录，discover 依赖 cwd
+V="<装有 hermes_cli 的 venv 里的 python>"
+T="<临时目录>/supplier-models-harness"    # 副本建在仓外
 rm -rf "$T" && mkdir -p "$T"
-cp <一份 config.yaml> "$T/config.yaml"
-cp <一份 .env>        "$T/.env"
+cp "<副本源 config.yaml>" "$T/config.yaml"
+cp "<副本源 .env>"        "$T/.env"
 HERMES_HOME="$(cygpath -w "$T")" "$V" -m unittest discover -s tests -v
 rm -rf "$T"
 ```
@@ -84,13 +86,13 @@ rm -rf "$T"
 
 - **副本源必须是「还留有 legacy `custom_providers:` 条目」的状态**。多个用例的 `setUp` 会以副本里
   真实存在的 legacy/`providers:` 条目作取材对象并断言其存在；喂一份 `custom_providers: []` 的副本会
-  有成批 `setUp` 前置断言失败，那是**输入不匹配，不是代码缺陷**。本机 2026-09-24 那对基线备份已随
-  Temp 清理丢失，现存的两份 10-02 归档都是迁移后的 `custom_providers: []`，需要另找或手工构造副本。
+  有成批 `setUp` 前置断言失败，那是**输入不匹配，不是代码缺陷**。交付时用的那对基线备份已随临时目录
+  清理丢失，10-02 归档里的两份 config 都已是迁移后的 `custom_providers: []`，需要另找或手工构造副本。
 - **副本里含明文密钥**，跑完务必删掉临时目录，别留在盘上；副本目录**务必建在仓外**（系统 Temp），
   本仓 `.gitignore` 已硬性排除 `config.yaml` / `.env` 等，防止带密钥的副本被误提交；
   断言一律走 sha256 / 存在性比较，不许把 key 值打印进测试输出。
-- **真配置只读**。任何用例都不许写 `H:\application\hermesnew\home\` 或现行 `%LOCALAPPDATA%\hermes\`
-  下的 `config.yaml` / `.env`。
+- **真配置只读**。任何用例都不许写**真实 Hermes home**（`$HERMES_HOME`）下的 `config.yaml` / `.env`，
+  只许操作临时副本。
 
 ## 六、已知边界与坑（设计使然，别当 bug 改）
 
@@ -117,7 +119,7 @@ rm -rf "$T"
 
 2026-09-24 人工清单全清后收束：**F/T 38 项 = 通过 31 / 结案（非缺陷）5 / 未跑待人工 2 / 未通过 0 / 阻塞 0**。
 两项未跑均不阻塞：T13/5e（用户裁定不跑 `hermes update`，它会动整个安装）、F6（移除单个模型后选择器消失的
-GUI 子句，机制同已结案的 F4）。台账在 `D:\hermeswork\doc\providerchange\tasks\`（权威计数只在
+GUI 子句，机制同已结案的 F4）。台账在交付文档目录 `doc/providerchange/tasks/`（本仓之外；权威计数只在
 `m8-integration-verification.md` §十一 与 `progress.md` §十九，过程快照数字别引用）。
 
-安全提示：迁移核验时 sensenova 的明文 key 曾进过命令行输出，若那段会话内容外发过，建议轮换该 key。
+安全提示：迁移核验阶段曾有供应商明文 key 出现在命令行输出里；若那部分内容外发过，应轮换对应 key。

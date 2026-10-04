@@ -12,14 +12,14 @@
 * 计数一律「先从副本读、再断言」（prompt §2.7）：``sensenova`` / ``bailian`` 只是**优先**取材对象，
   「2 条 legacy」「3 个模型」都是 2026-09-22 快照，不硬编码成期望值。
 
-跑法（逐字照抄；跑完 ``rm -rf`` —— 副本里有明文密钥，不许留在盘上）：
+跑法（填好占位后照抄；跑完 ``rm -rf`` —— 副本里有明文密钥，不许留在盘上）：
 
-    cd "H:/application/hermesnew/home/plugins/supplier-models"
-    V="H:/application/hermesnew/hermes-agent/venv/Scripts/python.exe"
-    T="$LOCALAPPDATA/Temp/providerchange-harness"
+    cd "<本仓根目录>"                        # 必须 cd 到含 tests/ 的目录，discover 依赖 cwd
+    V="<装有 hermes_cli 的 venv 里的 python>"
+    T="<临时目录>/supplier-models-harness"    # 副本务必建在仓外，本仓 .gitignore 已排除 config/.env
     rm -rf "$T" && mkdir -p "$T"
-    cp H:/application/hermesnew/home/config.yaml "$T/config.yaml"
-    cp H:/application/hermesnew/home/.env         "$T/.env"
+    cp "<副本源 config.yaml>" "$T/config.yaml"   # 副本源须仍留有 legacy custom_providers: 条目
+    cp "<副本源 .env>"        "$T/.env"
     HERMES_HOME="$(cygpath -w "$T")" "$V" -m unittest discover -s tests -v
     rm -rf "$T"
 

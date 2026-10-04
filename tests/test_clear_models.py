@@ -1,13 +1,13 @@
 """M5 验收：清空白名单 ``POST /endpoints/{id}/clear-models``（M5.6 / M5.7 / M5.8；T19 / T24 的自动化半边）。
 
-跑法（``tasks/progress.md`` §五 / ``prompt.md`` §5.1，逐字照抄；venv 里没有 pytest 也不许装）：
+跑法（``tasks/progress.md`` §五 / ``prompt.md`` §5.1，填好占位后照抄；venv 里没有 pytest 也不许装）：
 
-    cd "H:/application/hermesnew/home/plugins/supplier-models"
-    V="H:/application/hermesnew/hermes-agent/venv/Scripts/python.exe"
-    T="$LOCALAPPDATA/Temp/providerchange-harness"
+    cd "<本仓根目录>"                        # 必须 cd 到含 tests/ 的目录，discover 依赖 cwd
+    V="<装有 hermes_cli 的 venv 里的 python>"
+    T="<临时目录>/supplier-models-harness"    # 副本务必建在仓外，本仓 .gitignore 已排除 config/.env
     rm -rf "$T" && mkdir -p "$T"
-    cp H:/application/hermesnew/home/config.yaml "$T/config.yaml"
-    cp H:/application/hermesnew/home/.env         "$T/.env"
+    cp "<副本源 config.yaml>" "$T/config.yaml"   # 副本源须仍留有 legacy custom_providers: 条目
+    cp "<副本源 .env>"        "$T/.env"
     HERMES_HOME="$(cygpath -w "$T")" "$V" -m unittest discover -s tests -v
     rm -rf "$T"
 
